@@ -20,25 +20,39 @@ app.use(cors({
 app.use(express.json());
 
 // MongoDB connection with caching for serverless
-let isConnected = false;
+let cachedDb = null;
 
 const connectDB = async () => {
-    if (isConnected) {
-        console.log('Using existing MongoDB connection');
-        return;
+    if (cachedDb && mongoose.connection.readyState === 1) {
+        console.log('Using cached MongoDB connection');
+        return cachedDb;
     }
 
     try {
-        const db = await mongoose.connect(process.env.MONGODB_URI, {
-            bufferCommands: false,
-        });
-        isConnected = db.connections[0].readyState === 1;
-        console.log('MongoDB Connected');
+        console.log('Connecting to MongoDB...');
+
+        if (!process.env.MONGODB_URI) {
+            throw new Error('MONGODB_URI environment variable is not set');
+        }
+
+        const conn = await mongoose.connect(process.env.MONGODB_URI);
+        cachedDb = conn;
+        console.log('MongoDB Connected:', conn.connection.host);
+        return cachedDb;
     } catch (err) {
         console.error('MongoDB Connection Error:', err.message);
         throw err;
     }
 };
+
+// Health check - no auth required
+app.get('/api/test', (req, res) => {
+    res.json({
+        message: 'API is running on Vercel!',
+        mongoUri: process.env.MONGODB_URI ? 'SET' : 'NOT SET',
+        jwtSecret: process.env.JWT_SECRET ? 'SET' : 'NOT SET'
+    });
+});
 
 // Mount all routes
 app.use('/api/auth', authRoutes);
@@ -48,13 +62,25 @@ app.use('/api/timetable', timetableRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/share', shareRoutes);
 
-// Health check
-app.get('/api/test', (req, res) => {
-    res.json({ message: 'API is running on Vercel!' });
+// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error('Server Error:', err);
+    res.status(500).json({
+        error: 'Internal Server Error',
+        message: err.message
+    });
 });
 
 // Vercel serverless handler
 export default async function handler(req, res) {
-    await connectDB();
-    return app(req, res);
+    try {
+        await connectDB();
+        return app(req, res);
+    } catch (err) {
+        console.error('Handler Error:', err);
+        return res.status(500).json({
+            error: 'Database connection failed',
+            message: err.message
+        });
+    }
 }
