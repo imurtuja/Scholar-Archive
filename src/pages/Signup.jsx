@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { User, Mail, Lock, School, BookOpen, Calendar, Loader, ArrowRight, ArrowLeft, GraduationCap, Sparkles, Shield, Upload, Share2, ChevronDown } from 'lucide-react';
 import usePageTitle from '../hooks/usePageTitle';
@@ -63,6 +63,7 @@ const CustomSelect = ({ label, icon: Icon, value, onChange, options, placeholder
     );
 };
 
+
 const Signup = () => {
     usePageTitle('Create Account');
     const [step, setStep] = useState(1);
@@ -80,7 +81,11 @@ const Signup = () => {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     const { setAuth } = useAuth();
+
+    // Get the redirect URL from query params (if coming from a protected route)
+    const redirectUrl = searchParams.get('redirect') || '/dashboard';
 
     // Degree to Majors mapping
     const degreeMajorsMap = {
@@ -279,7 +284,8 @@ const Signup = () => {
                 throw new Error(data.message || 'Registration failed');
             }
             setAuth(data.token, data.user);
-            navigate('/dashboard');
+            // Navigate to the redirect URL (shared link or dashboard)
+            navigate(redirectUrl);
         } catch (err) {
             setError(err.message);
         } finally {
