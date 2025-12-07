@@ -153,78 +153,85 @@ const MyShares = () => {
                         >
                             {/* Main Row */}
                             <div className="p-4 lg:p-5">
-                                <div className="flex items-start gap-4">
-                                    {/* Icon */}
-                                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${share.type === 'resource'
+                                {/* Mobile: Stack vertically, Desktop: Horizontal */}
+                                <div className="flex flex-col lg:flex-row lg:items-start gap-3 lg:gap-4">
+                                    {/* Icon + Content Group */}
+                                    <div className="flex items-start gap-3 flex-1 min-w-0">
+                                        {/* Icon */}
+                                        <div className={`w-10 h-10 lg:w-12 lg:h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${share.type === 'resource'
                                             ? 'bg-gradient-to-br from-emerald-500/20 to-teal-500/20'
                                             : 'bg-gradient-to-br from-indigo-500/20 to-purple-500/20'
-                                        }`}>
-                                        {share.type === 'resource' ? (
-                                            <FileText className="text-emerald-400" size={24} />
-                                        ) : (
-                                            <BookOpen className="text-indigo-400" size={24} />
-                                        )}
-                                    </div>
+                                            }`}>
+                                            {share.type === 'resource' ? (
+                                                <FileText className="text-emerald-400" size={20} />
+                                            ) : (
+                                                <BookOpen className="text-indigo-400" size={20} />
+                                            )}
+                                        </div>
 
-                                    {/* Content */}
-                                    <div className="flex-1 min-w-0">
-                                        <div className="flex items-start justify-between gap-3 mb-1">
-                                            <h3 className="font-semibold text-white truncate">{share.title}</h3>
-                                            <span className={`px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0 ${share.type === 'resource'
+                                        {/* Content */}
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-start justify-between gap-2 mb-1">
+                                                <h3 className="font-semibold text-white truncate text-sm lg:text-base">{share.title}</h3>
+                                                <span className={`px-2 py-0.5 rounded-full text-[10px] lg:text-xs font-medium flex-shrink-0 ${share.type === 'resource'
                                                     ? 'bg-emerald-500/20 text-emerald-400'
                                                     : 'bg-indigo-500/20 text-indigo-400'
-                                                }`}>
-                                                {share.type === 'resource' ? 'Resource' : 'Subject'}
-                                            </span>
-                                        </div>
-                                        {share.description && (
-                                            <p className="text-white/40 text-sm truncate mb-2">{share.description}</p>
-                                        )}
-                                        <div className="flex items-center gap-4 text-xs text-white/40">
-                                            <span className="flex items-center gap-1">
-                                                <Clock size={12} />
-                                                Created {formatDate(share.createdAt)}
-                                            </span>
-                                            <span className="flex items-center gap-1">
-                                                <Eye size={12} />
-                                                {share.views?.length || 0} views
-                                            </span>
+                                                    }`}>
+                                                    {share.type === 'resource' ? 'Resource' : 'Subject'}
+                                                </span>
+                                            </div>
+                                            {share.description && (
+                                                <p className="text-white/40 text-xs lg:text-sm truncate mb-2">{share.description}</p>
+                                            )}
+                                            <div className="flex flex-wrap items-center gap-2 lg:gap-4 text-[10px] lg:text-xs text-white/40">
+                                                <span className="flex items-center gap-1">
+                                                    <Clock size={10} />
+                                                    Created {formatDate(share.createdAt)}
+                                                </span>
+                                                <span className="flex items-center gap-1">
+                                                    <Eye size={10} />
+                                                    {share.views?.length || 0} views
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
 
-                                    {/* Actions */}
-                                    <div className="flex items-center gap-2 flex-shrink-0">
+                                    {/* Actions - Full width on mobile, inline on desktop */}
+                                    <div className="flex items-center gap-2 flex-shrink-0 mt-2 lg:mt-0 pt-2 lg:pt-0 border-t lg:border-t-0 border-white/5">
                                         <button
                                             onClick={() => handleCopyLink(share.linkId)}
-                                            className="p-2 bg-white/5 hover:bg-emerald-500/20 rounded-lg transition-colors group"
+                                            className="flex-1 lg:flex-none p-2.5 lg:p-2 bg-white/5 hover:bg-emerald-500/20 rounded-lg transition-colors group flex items-center justify-center gap-1.5"
                                             title="Copy Link"
                                         >
                                             {copiedId === share.linkId ? (
-                                                <Check size={18} className="text-emerald-400" />
+                                                <Check size={16} className="text-emerald-400" />
                                             ) : (
-                                                <Copy size={18} className="text-white/50 group-hover:text-emerald-400" />
+                                                <Copy size={16} className="text-white/50 group-hover:text-emerald-400" />
                                             )}
+                                            <span className="text-xs text-white/50 group-hover:text-emerald-400 lg:hidden">Copy</span>
                                         </button>
                                         <a
                                             href={`/shared/${share.linkId}`}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="p-2 bg-white/5 hover:bg-indigo-500/20 rounded-lg transition-colors group"
+                                            className="flex-1 lg:flex-none p-2.5 lg:p-2 bg-white/5 hover:bg-indigo-500/20 rounded-lg transition-colors group flex items-center justify-center gap-1.5"
                                             title="Open Link"
                                         >
-                                            <ExternalLink size={18} className="text-white/50 group-hover:text-indigo-400" />
+                                            <ExternalLink size={16} className="text-white/50 group-hover:text-indigo-400" />
+                                            <span className="text-xs text-white/50 group-hover:text-indigo-400 lg:hidden">Open</span>
                                         </a>
                                         <button
                                             onClick={() => handleDelete(share._id)}
                                             disabled={deletingId === share._id}
-                                            className="p-2 bg-white/5 hover:bg-red-500/20 rounded-lg transition-colors group disabled:opacity-50"
+                                            className="flex-1 lg:flex-none p-2.5 lg:p-2 bg-white/5 hover:bg-red-500/20 rounded-lg transition-colors group disabled:opacity-50 flex items-center justify-center gap-1.5"
                                             title="Delete Share"
                                         >
                                             {deletingId === share._id ? (
-                                                <Loader size={18} className="animate-spin text-red-400" />
+                                                <Loader size={16} className="animate-spin text-red-400" />
                                             ) : (
-                                                <Trash2 size={18} className="text-white/50 group-hover:text-red-400" />
+                                                <Trash2 size={16} className="text-white/50 group-hover:text-red-400" />
                                             )}
+                                            <span className="text-xs text-white/50 group-hover:text-red-400 lg:hidden">Delete</span>
                                         </button>
                                     </div>
                                 </div>

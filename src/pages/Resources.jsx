@@ -203,7 +203,7 @@ const Resources = () => {
                 </div>
 
                 {/* Inline Add Resource Form */}
-                <div className={`bg-[#13131f] border border-white/10 rounded-2xl transition-all duration-300 overflow-hidden ${isExpanded ? 'ring-2 ring-indigo-500/20' : ''}`}>
+                <div className={`bg-[#13131f] border border-white/10 rounded-2xl transition-all duration-300 overflow-hidden ${isExpanded ? 'border-indigo-500/30' : ''}`}>
                     <form onSubmit={handleAddResource}>
                         {/* Collapsed View / Header */}
                         <div className="p-5 flex gap-4 items-start">
@@ -226,7 +226,7 @@ const Resources = () => {
                                             required
                                             value={newResource.title}
                                             onChange={e => setNewResource({ ...newResource, title: e.target.value })}
-                                            className="w-full bg-transparent text-white font-bold text-lg outline-none placeholder:text-white/30"
+                                            className="w-full bg-transparent text-white font-bold text-lg outline-none focus:outline-none focus:ring-0 border-none placeholder:text-white/30"
                                             autoFocus
                                         />
 

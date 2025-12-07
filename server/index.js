@@ -4,20 +4,24 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import authRoutes from './routes/auth.js';
-import subjectRoutes from './routes/subjects.js';
-import resourceRoutes from './routes/resources.js';
+import passport from 'passport';
 
-// Load env vars
+// Load env vars FIRST before any routes that depend on env
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.join(__dirname, '../.env') });
+
+// Now import routes after env is loaded
+const { default: authRoutes } = await import('./routes/auth.js');
+const { default: subjectRoutes } = await import('./routes/subjects.js');
+const { default: resourceRoutes } = await import('./routes/resources.js');
 
 const app = express();
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(passport.initialize());
 
 // DB Connection
 const connectDB = async () => {
@@ -50,17 +54,21 @@ app.use('/api/subjects', subjectRoutes);
 console.log('Mounting resource routes...');
 app.use('/api/resources', resourceRoutes);
 
-import timetableRoutes from './routes/timetable.js';
+const { default: timetableRoutes } = await import('./routes/timetable.js');
 console.log('Mounting timetable routes...');
 app.use('/api/timetable', timetableRoutes);
 
-import dashboardRoutes from './routes/dashboard.js';
+const { default: dashboardRoutes } = await import('./routes/dashboard.js');
 console.log('Mounting dashboard routes...');
 app.use('/api/dashboard', dashboardRoutes);
 
-import shareRoutes from './routes/share.js';
+const { default: shareRoutes } = await import('./routes/share.js');
 console.log('Mounting share routes...');
 app.use('/api/share', shareRoutes);
+
+const { default: searchRoutes } = await import('./routes/search.js');
+console.log('Mounting search routes...');
+app.use('/api/search', searchRoutes);
 
 // Catch-all for debugging 404s
 app.use((req, res, next) => {

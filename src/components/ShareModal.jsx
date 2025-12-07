@@ -131,7 +131,7 @@ const ShareModal = ({ isOpen, onClose, type, targetId, title }) => {
             <div className="absolute inset-0 bg-black/70 backdrop-blur-md" onClick={onClose} />
 
             {/* Modal */}
-            <div className="relative w-full max-w-lg bg-gradient-to-b from-[#1a1a2e] to-[#13131f] border border-white/10 rounded-3xl shadow-2xl shadow-black/50 overflow-hidden">
+            <div className="relative w-full max-w-lg bg-gradient-to-b from-[#1a1a2e] to-[#13131f] dark:from-[#1a1a2e] dark:to-[#13131f] light-modal border border-white/10 rounded-3xl shadow-2xl shadow-black/50 overflow-hidden">
                 {/* Decorative gradient blur */}
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-gradient-to-r from-indigo-500/20 via-purple-500/20 to-pink-500/20 blur-3xl" />
 
@@ -175,13 +175,13 @@ const ShareModal = ({ isOpen, onClose, type, targetId, title }) => {
                                         key={key}
                                         onClick={() => toggleContent(key)}
                                         className={`w-full flex items-center gap-4 p-4 rounded-2xl border transition-all duration-300 group ${includedContent[key]
-                                                ? 'bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border-indigo-500/30'
-                                                : 'bg-white/[0.02] border-white/5 hover:bg-white/[0.05] hover:border-white/10'
+                                            ? 'bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border-indigo-500/30'
+                                            : 'bg-white/[0.02] border-white/5 hover:bg-white/[0.05] hover:border-white/10'
                                             }`}
                                     >
                                         <div className={`w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-300 ${includedContent[key]
-                                                ? 'bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg shadow-indigo-500/25'
-                                                : 'bg-white/5 group-hover:bg-white/10'
+                                            ? 'bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg shadow-indigo-500/25'
+                                            : 'bg-white/5 group-hover:bg-white/10'
                                             }`}>
                                             <Icon size={20} className={includedContent[key] ? 'text-white' : 'text-white/40'} />
                                         </div>
@@ -192,8 +192,8 @@ const ShareModal = ({ isOpen, onClose, type, targetId, title }) => {
                                             <p className="text-xs text-white/30">{description}</p>
                                         </div>
                                         <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${includedContent[key]
-                                                ? 'bg-gradient-to-br from-indigo-500 to-purple-600 border-transparent'
-                                                : 'border-white/20'
+                                            ? 'bg-gradient-to-br from-indigo-500 to-purple-600 border-transparent'
+                                            : 'border-white/20'
                                             }`}>
                                             {includedContent[key] && <Check size={14} className="text-white" />}
                                         </div>
@@ -264,8 +264,8 @@ const ShareModal = ({ isOpen, onClose, type, targetId, title }) => {
                                         <button
                                             onClick={copyToClipboard}
                                             className={`w-full mt-3 py-3 rounded-xl font-medium transition-all duration-300 flex items-center justify-center gap-2 ${copied
-                                                    ? 'bg-green-500/20 text-green-400 border border-green-500/30'
-                                                    : 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:from-indigo-400 hover:to-purple-500 shadow-lg shadow-indigo-500/20'
+                                                ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                                                : 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:from-indigo-400 hover:to-purple-500 shadow-lg shadow-indigo-500/20'
                                                 }`}
                                         >
                                             {copied ? (

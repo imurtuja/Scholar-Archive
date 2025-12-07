@@ -1,13 +1,27 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { useAuth } from '../context/AuthContext';
-import { ArrowRight, Calendar, FileText, Shield, Sparkles, BookOpen, Clock, Users, Share2, Upload, FolderOpen, Zap, CheckCircle, Star } from 'lucide-react';
+import { ArrowRight, Calendar, FileText, Shield, Sparkles, BookOpen, Clock, Users, Share2, Upload, FolderOpen, Zap, CheckCircle, Star, Sun, Moon } from 'lucide-react';
 import usePageTitle from '../hooks/usePageTitle';
 
 const Home = () => {
     usePageTitle('Your Academic Hub');
     const { user } = useAuth();
+    const [theme, setTheme] = useState(localStorage.getItem('theme') || 'dark');
+
+    const toggleTheme = () => {
+        const newTheme = theme === 'dark' ? 'light' : 'dark';
+        setTheme(newTheme);
+        localStorage.setItem('theme', newTheme);
+        if (newTheme === 'light') {
+            document.documentElement.classList.add('light-theme');
+            document.documentElement.classList.remove('dark-theme');
+        } else {
+            document.documentElement.classList.add('dark-theme');
+            document.documentElement.classList.remove('light-theme');
+        }
+    };
 
     const highlights = [
         { icon: Zap, title: 'Free Forever', desc: 'No hidden costs' },
@@ -289,10 +303,29 @@ const Home = () => {
                     <div className="text-white/40 text-sm">
                         © 2025 ScholarArchive. All rights reserved.
                     </div>
-                    <div className="flex gap-6 text-white/40 text-sm">
+                    <div className="flex items-center gap-6 text-white/40 text-sm">
                         <Link to="/privacy" className="hover:text-white transition-colors">Privacy</Link>
                         <Link to="/terms" className="hover:text-white transition-colors">Terms</Link>
                         <Link to="/contact" className="hover:text-white transition-colors">Contact</Link>
+
+                        {/* Theme Toggle */}
+                        <button
+                            onClick={toggleTheme}
+                            className="flex items-center gap-2 px-3 py-1.5 bg-white/5 hover:bg-white/10 rounded-lg border border-white/10 transition-all"
+                            title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+                        >
+                            {theme === 'dark' ? (
+                                <>
+                                    <Sun size={14} className="text-amber-400" />
+                                    <span className="text-xs">Light</span>
+                                </>
+                            ) : (
+                                <>
+                                    <Moon size={14} className="text-indigo-400" />
+                                    <span className="text-xs">Dark</span>
+                                </>
+                            )}
+                        </button>
                     </div>
                 </div>
             </footer>

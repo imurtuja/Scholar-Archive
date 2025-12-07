@@ -80,9 +80,55 @@ const Signup = () => {
     });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [googleLoading, setGoogleLoading] = useState(false);
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const { setAuth } = useAuth();
+
+    // OTP verification states
+    const [otp, setOtp] = useState('');
+    const [otpSent, setOtpSent] = useState(false);
+    const [otpVerified, setOtpVerified] = useState(false);
+    const [otpLoading, setOtpLoading] = useState(false);
+    const [resendTimer, setResendTimer] = useState(0);
+
+    // Password states
+    const [confirmPassword, setConfirmPassword] = useState('');
+
+    // Password strength calculation
+    const getPasswordStrength = (password) => {
+        let score = 0;
+        let feedback = [];
+
+        if (password.length >= 8) score += 1;
+        else feedback.push('8+ characters');
+
+        if (/[A-Z]/.test(password)) score += 1;
+        else feedback.push('uppercase');
+
+        if (/[a-z]/.test(password)) score += 1;
+        else feedback.push('lowercase');
+
+        if (/[0-9]/.test(password)) score += 1;
+        else feedback.push('number');
+
+        if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) score += 1;
+        else feedback.push('special char');
+
+        const levels = ['Very Weak', 'Weak', 'Fair', 'Good', 'Strong'];
+        const colors = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#10b981'];
+
+        return {
+            score,
+            level: levels[score - 1] || 'Very Weak',
+            color: colors[score - 1] || '#ef4444',
+            percentage: (score / 5) * 100,
+            feedback
+        };
+    };
+
+    const passwordStrength = getPasswordStrength(formData.password);
+    const passwordsMatch = formData.password === confirmPassword && confirmPassword !== '';
 
     // Get the redirect URL from query params (if coming from a protected route)
     const redirectUrl = searchParams.get('redirect') || '/dashboard';
@@ -256,8 +302,96 @@ const Signup = () => {
 
     const handleNext = (e) => {
         e.preventDefault();
-        if (step === 1 && formData.name && formData.email && formData.password) {
+        if (step === 1 && formData.name && formData.email && formData.password && passwordStrength.score >= 5 && passwordsMatch) {
+            handleSendOTP();
+        } else if (step === 2 && otpVerified) {
+            setStep(3);
+        }
+    };
+
+    // Send OTP to email
+    const handleSendOTP = async () => {
+        setError('');
+        setOtpLoading(true);
+        try {
+            const res = await fetch('/api/auth/send-otp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: formData.email, name: formData.name })
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                throw new Error(data.message || 'Failed to send OTP');
+            }
+            setOtpSent(true);
             setStep(2);
+            startResendTimer();
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setOtpLoading(false);
+        }
+    };
+
+    // Verify OTP
+    const handleVerifyOTP = async (e) => {
+        e.preventDefault();
+        setError('');
+        setOtpLoading(true);
+        try {
+            const res = await fetch('/api/auth/verify-otp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: formData.email, otp })
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                throw new Error(data.message || 'Invalid OTP');
+            }
+            setOtpVerified(true);
+            setStep(3);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setOtpLoading(false);
+        }
+    };
+
+    // Resend timer
+    const startResendTimer = () => {
+        setResendTimer(60);
+        const interval = setInterval(() => {
+            setResendTimer(prev => {
+                if (prev <= 1) {
+                    clearInterval(interval);
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
+    };
+
+    // Resend OTP
+    const handleResendOTP = async () => {
+        if (resendTimer > 0) return;
+        setError('');
+        setOtpLoading(true);
+        try {
+            const res = await fetch('/api/auth/send-otp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: formData.email, name: formData.name })
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                throw new Error(data.message || 'Failed to resend OTP');
+            }
+            setOtp('');
+            startResendTimer();
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setOtpLoading(false);
         }
     };
 
@@ -370,13 +504,14 @@ const Signup = () => {
                                 </div>
                                 <h2 className="text-2xl font-bold text-white mb-2">Create your account</h2>
                                 <p className="text-white/50 text-sm">
-                                    {step === 1 ? 'Step 1: Personal Information' : 'Step 2: Academic Details'}
+                                    {step === 1 ? 'Step 1: Personal Details' : step === 2 ? 'Step 2: Verify Email' : 'Step 3: Password & Academic Details'}
                                 </p>
                             </div>
 
                             <div className="flex items-center gap-3 mb-8">
                                 <div className={`flex-1 h-1.5 rounded-full ${step >= 1 ? 'bg-gradient-to-r from-indigo-500 to-purple-500' : 'bg-white/10'}`}></div>
                                 <div className={`flex-1 h-1.5 rounded-full ${step >= 2 ? 'bg-gradient-to-r from-purple-500 to-pink-500' : 'bg-white/10'}`}></div>
+                                <div className={`flex-1 h-1.5 rounded-full ${step >= 3 ? 'bg-gradient-to-r from-pink-500 to-orange-500' : 'bg-white/10'}`}></div>
                             </div>
 
                             {error && (
@@ -424,6 +559,7 @@ const Signup = () => {
                                         </div>
                                     </div>
 
+                                    {/* Password */}
                                     <div>
                                         <label className="block text-sm font-medium text-white/70 mb-2">Password</label>
                                         <div className="relative flex items-center">
@@ -434,26 +570,167 @@ const Signup = () => {
                                                 type="password"
                                                 name="password"
                                                 required
-                                                minLength={6}
+                                                autoComplete="new-password"
                                                 className="w-full h-12 pl-12 pr-4 bg-[#1a1a2e] border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-indigo-500/50 focus:ring-2 focus:ring-indigo-500/20 transition-all"
-                                                placeholder="Min. 6 characters"
+                                                placeholder="Create a strong password"
                                                 value={formData.password}
                                                 onChange={handleChange}
                                             />
                                         </div>
+
+                                        {/* Password Strength Bar */}
+                                        {formData.password && (
+                                            <div className="mt-3">
+                                                <div className="flex items-center justify-between mb-1.5">
+                                                    <span className="text-xs text-white/50">Password Strength</span>
+                                                    <span className="text-xs font-medium" style={{ color: passwordStrength.color }}>
+                                                        {passwordStrength.level}
+                                                    </span>
+                                                </div>
+                                                <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+                                                    <div
+                                                        className="h-full rounded-full transition-all duration-300"
+                                                        style={{
+                                                            width: `${passwordStrength.percentage}%`,
+                                                            backgroundColor: passwordStrength.color
+                                                        }}
+                                                    />
+                                                </div>
+                                                {passwordStrength.feedback.length > 0 && (
+                                                    <p className="text-xs text-white/40 mt-1.5">
+                                                        Missing: {passwordStrength.feedback.join(', ')}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Confirm Password */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-white/70 mb-2">Confirm Password</label>
+                                        <div className="relative flex items-center">
+                                            <div className="absolute left-4 flex items-center pointer-events-none">
+                                                <Lock size={18} className="text-white/40" />
+                                            </div>
+                                            <input
+                                                type="password"
+                                                required
+                                                autoComplete="new-password"
+                                                className={`w-full h-12 pl-12 pr-12 bg-[#1a1a2e] border rounded-xl text-white placeholder-white/30 focus:outline-none transition-all ${confirmPassword && (passwordsMatch ? 'border-green-500/50 focus:border-green-500' : 'border-red-500/50 focus:border-red-500')
+                                                    } ${!confirmPassword && 'border-white/10 focus:border-indigo-500/50'}`}
+                                                placeholder="Confirm your password"
+                                                value={confirmPassword}
+                                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                            />
+                                            {confirmPassword && (
+                                                <div className="absolute right-4 flex items-center">
+                                                    {passwordsMatch ? (
+                                                        <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center">
+                                                            <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                                            </svg>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="w-5 h-5 rounded-full bg-red-500 flex items-center justify-center">
+                                                            <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
+                                                            </svg>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                        {confirmPassword && !passwordsMatch && (
+                                            <p className="text-xs text-red-400 mt-1.5">Passwords do not match</p>
+                                        )}
                                     </div>
 
                                     <button
                                         type="submit"
-                                        className="w-full h-12 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl font-semibold flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:-translate-y-0.5 transition-all mt-6"
+                                        disabled={otpLoading || passwordStrength.score < 5 || !passwordsMatch}
+                                        className="w-full h-12 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl font-semibold flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:-translate-y-0.5 transition-all mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
-                                        <span>Continue</span>
-                                        <ArrowRight size={20} />
+                                        {otpLoading ? (
+                                            <>
+                                                <Loader size={20} className="animate-spin" />
+                                                <span>Sending OTP...</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <span>Send Verification Code</span>
+                                                <ArrowRight size={20} />
+                                            </>
+                                        )}
                                     </button>
                                 </form>
                             )}
 
                             {step === 2 && (
+                                <form onSubmit={handleVerifyOTP} className="space-y-5">
+                                    <div className="text-center mb-4">
+                                        <div className="w-16 h-16 mx-auto bg-green-500/20 rounded-full flex items-center justify-center mb-4">
+                                            <Mail size={28} className="text-green-400" />
+                                        </div>
+                                        <p className="text-white/70 text-sm">
+                                            We've sent a 6-digit code to<br />
+                                            <span className="text-white font-semibold">{formData.email}</span>
+                                        </p>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-white/70 mb-2">Verification Code</label>
+                                        <input
+                                            type="text"
+                                            maxLength={6}
+                                            required
+                                            className="w-full h-14 px-4 bg-[#1a1a2e] border border-white/10 rounded-xl text-white text-center text-2xl font-bold tracking-[0.5em] placeholder-white/30 focus:outline-none focus:border-green-500/50 focus:ring-2 focus:ring-green-500/20 transition-all"
+                                            placeholder="000000"
+                                            value={otp}
+                                            onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                                        />
+                                    </div>
+
+                                    <button
+                                        type="submit"
+                                        disabled={otpLoading || otp.length !== 6}
+                                        className="w-full h-12 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-semibold flex items-center justify-center gap-2 shadow-lg shadow-green-500/25 hover:shadow-green-500/40 hover:-translate-y-0.5 transition-all disabled:opacity-50"
+                                    >
+                                        {otpLoading ? (
+                                            <>
+                                                <Loader size={20} className="animate-spin" />
+                                                <span>Verifying...</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <span>Verify Email</span>
+                                                <ArrowRight size={20} />
+                                            </>
+                                        )}
+                                    </button>
+
+                                    <div className="text-center">
+                                        <button
+                                            type="button"
+                                            onClick={handleResendOTP}
+                                            disabled={resendTimer > 0 || otpLoading}
+                                            className="text-sm text-indigo-400 hover:text-indigo-300 disabled:text-white/30 transition-colors"
+                                        >
+                                            {resendTimer > 0 ? `Resend code in ${resendTimer}s` : "Didn't receive code? Resend"}
+                                        </button>
+                                    </div>
+
+                                    <button
+                                        type="button"
+                                        onClick={() => { setStep(1); setOtpSent(false); setOtp(''); }}
+                                        className="w-full flex items-center justify-center gap-2 text-white/50 hover:text-white transition-colors text-sm"
+                                    >
+                                        <ArrowLeft size={16} />
+                                        <span>Change email address</span>
+                                    </button>
+                                </form>
+                            )}
+
+                            {step === 3 && (
                                 <form onSubmit={handleSubmit} className="space-y-5">
                                     <div>
                                         <label className="block text-sm font-medium text-white/70 mb-2">Institution</label>
@@ -544,7 +821,34 @@ const Signup = () => {
                                 <div className="flex-1 h-px bg-white/10"></div>
                             </div>
 
-                            <p className="text-center text-white/50">
+                            {/* Google Signup Button */}
+                            <button
+                                onClick={() => {
+                                    setGoogleLoading(true);
+                                    window.location.href = '/api/auth/google';
+                                }}
+                                disabled={googleLoading}
+                                className="w-full h-12 bg-white hover:bg-gray-100 text-gray-700 rounded-xl font-semibold flex items-center justify-center gap-3 shadow-lg hover:-translate-y-0.5 transition-all disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+                            >
+                                {googleLoading ? (
+                                    <>
+                                        <Loader className="animate-spin" size={20} />
+                                        <span>Connecting to Google...</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <svg className="w-5 h-5" viewBox="0 0 24 24">
+                                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                                        </svg>
+                                        <span>Continue with Google</span>
+                                    </>
+                                )}
+                            </button>
+
+                            <p className="text-center text-white/50 mt-6">
                                 Already have an account?{' '}
                                 <Link to="/login" className="text-indigo-400 font-semibold hover:text-indigo-300 transition-colors">
                                     Sign In

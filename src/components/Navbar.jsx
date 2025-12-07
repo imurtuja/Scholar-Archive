@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { LogOut, User, Menu, X, GraduationCap, LayoutDashboard, Sparkles } from 'lucide-react';
+import { LogOut, User, Menu, X, GraduationCap, LayoutDashboard, Sparkles, Search, Command } from 'lucide-react';
 
 const Navbar = () => {
     const { user, logout } = useAuth();
@@ -28,7 +28,9 @@ const Navbar = () => {
         window.location.pathname.startsWith('/timetable') ||
         window.location.pathname.startsWith('/resources') ||
         window.location.pathname.startsWith('/settings') ||
-        window.location.pathname.startsWith('/profile');
+        window.location.pathname.startsWith('/profile') ||
+        window.location.pathname.startsWith('/my-shares') ||
+        window.location.pathname.startsWith('/shared');
     const isAuthPage = window.location.pathname === '/login' || window.location.pathname === '/signup';
     const isHome = window.location.pathname === '/';
 
@@ -52,6 +54,23 @@ const Navbar = () => {
                 <div className="hidden md:flex items-center gap-2">
                     {user ? (
                         <div className="flex items-center gap-3">
+                            {/* Search Button - Show on dashboard pages */}
+                            {isDashboard && (
+                                <button
+                                    onClick={() => {
+                                        const event = new KeyboardEvent('keydown', { key: 'k', ctrlKey: true });
+                                        document.dispatchEvent(event);
+                                    }}
+                                    className="flex items-center gap-2 px-3 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-white/50 hover:text-white transition-all"
+                                    title="Search (Ctrl+K)"
+                                >
+                                    <Search size={16} />
+                                    <span className="text-sm hidden lg:inline">Search...</span>
+                                    <div className="hidden lg:flex items-center gap-0.5 ml-1 px-1.5 py-0.5 bg-white/5 rounded text-[10px] text-white/30">
+                                        <Command size={10} />K
+                                    </div>
+                                </button>
+                            )}
                             {/* Dashboard Link - Show on Home/Landing page */}
                             {isHome && (
                                 <Link
@@ -129,6 +148,20 @@ const Navbar = () => {
                                         <p className="text-xs text-white/50">{user.email}</p>
                                     </div>
                                 </div>
+                                {/* Mobile Search Button */}
+                                {isDashboard && (
+                                    <button
+                                        onClick={() => {
+                                            setIsMenuOpen(false);
+                                            const event = new KeyboardEvent('keydown', { key: 'k', ctrlKey: true });
+                                            document.dispatchEvent(event);
+                                        }}
+                                        className="flex items-center justify-center gap-2 w-full p-3.5 bg-white/5 border border-white/10 rounded-xl text-white/70 hover:text-white hover:bg-white/10 transition-all"
+                                    >
+                                        <Search size={18} />
+                                        <span>Search</span>
+                                    </button>
+                                )}
                                 {/* Dashboard Link for Mobile */}
                                 {isHome && (
                                     <Link

@@ -9,6 +9,7 @@ import resourceRoutes from '../server/routes/resources.js';
 import timetableRoutes from '../server/routes/timetable.js';
 import dashboardRoutes from '../server/routes/dashboard.js';
 import shareRoutes from '../server/routes/share.js';
+import searchRoutes from '../server/routes/search.js';
 
 const app = express();
 
@@ -61,6 +62,7 @@ app.use('/api/resources', resourceRoutes);
 app.use('/api/timetable', timetableRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/share', shareRoutes);
+app.use('/api/search', searchRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

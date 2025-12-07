@@ -1,8 +1,11 @@
 import React from 'react';
 import Sidebar from './Sidebar';
 import Navbar from './Navbar';
+import SearchModal, { useSearchModal } from './SearchModal';
 
 const Layout = ({ children }) => {
+    const { isOpen, close } = useSearchModal();
+
     return (
         <div className="min-h-screen bg-animated">
             <Navbar />
@@ -14,9 +17,11 @@ const Layout = ({ children }) => {
                     {children}
                 </main>
             </div>
+
+            {/* Global Search Modal */}
+            <SearchModal isOpen={isOpen} onClose={close} />
         </div>
     );
 };
 
 export default Layout;
-

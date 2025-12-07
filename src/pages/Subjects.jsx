@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { ChevronDown, ChevronRight, BookOpen, FileText, Upload, Loader, Trash2, X, Plus, GraduationCap, ExternalLink, Edit2, Share2 } from 'lucide-react';
 import ConfirmModal from '../components/ConfirmModal';
 import ShareModal from '../components/ShareModal';
@@ -211,9 +212,11 @@ const ResourceSection = ({ title, resources, onAddResource, onDeleteResource }) 
     );
 };
 
+
 const Subjects = () => {
     const { user, authenticatedFetch } = useAuth();
     const toast = useToast();
+    const [searchParams] = useSearchParams();
     const [subjects, setSubjects] = useState([]);
     const [selectedSubject, setSelectedSubject] = useState(null);
     const [activeTab, setActiveTab] = useState('syllabus');
@@ -378,6 +381,20 @@ const Subjects = () => {
     useEffect(() => {
         fetchSubjects();
     }, []);
+
+    // Auto-select subject from URL parameter (for search navigation)
+    useEffect(() => {
+        const subjectId = searchParams.get('id');
+        if (subjectId && subjects.length > 0 && !selectedSubject) {
+            const subject = subjects.find(s => s._id === subjectId);
+            if (subject) {
+                setSelectedSubject(subject);
+                // Expand the year and semester in sidebar
+                setExpandedYear(subject.year);
+                setExpandedSemester(`${subject.year}-${subject.semester}`);
+            }
+        }
+    }, [subjects, searchParams]);
 
     useEffect(() => {
         if (selectedSubject) {
@@ -757,7 +774,7 @@ ${useImages ? 'Parse syllabus from images:' : `SYLLABUS:\n${fullText.substring(0
                                         const hasSubjects = semesterSubjects.length > 0;
 
                                         return (
-                                            <div key={semester}>
+                                            <div key={semester} className="mb-2">
                                                 {/* Semester Row */}
                                                 <div
                                                     onClick={() => setExpandedSemester(isExpanded ? null : semesterKey)}
@@ -772,14 +789,14 @@ ${useImages ? 'Parse syllabus from images:' : `SYLLABUS:\n${fullText.substring(0
 
                                                 {/* Subject List */}
                                                 {isExpanded && hasSubjects && (
-                                                    <div className="mt-1 space-y-0.5">
+                                                    <div className="mt-1 space-y-1.5">
                                                         {semesterSubjects.map(subject => (
                                                             <div
                                                                 key={subject._id}
                                                                 onClick={() => setSelectedSubject(subject)}
-                                                                className={`flex items-center mx-3 ml-9 px-3 py-2 rounded-lg cursor-pointer transition-all text-sm ${selectedSubject?._id === subject._id
+                                                                className={`flex items-center mx-3 ml-9 px-3 py-2 rounded-lg cursor-pointer text-sm ${selectedSubject?._id === subject._id
                                                                     ? 'bg-indigo-500 text-white'
-                                                                    : 'text-white/50 hover:bg-white/5 hover:text-white/70'
+                                                                    : 'text-white/50 hover:bg-indigo-500/10 hover:text-white/70'
                                                                     }`}
                                                             >
                                                                 <span className="truncate">{subject.name}</span>

@@ -15,7 +15,7 @@ const userSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required: true
+        required: false  // Not required for OAuth users
     },
     role: {
         type: String,
@@ -50,9 +50,31 @@ const userSchema = new mongoose.Schema({
         type: Number,
         default: 8
     },
+    // Google OAuth fields
+    googleId: {
+        type: String,
+        sparse: true
+    },
+    authProvider: {
+        type: String,
+        enum: ['local', 'google'],
+        default: 'local'
+    },
+    profileComplete: {
+        type: Boolean,
+        default: false
+    },
+    isEmailVerified: {
+        type: Boolean,
+        default: false
+    },
     createdAt: {
         type: Date,
         default: Date.now
+    },
+    scheduledDeletion: {
+        type: Date,
+        default: null
     }
 });
 
