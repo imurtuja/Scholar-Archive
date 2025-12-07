@@ -11,10 +11,16 @@ const router = express.Router();
 // Configure Google OAuth Strategy (only if credentials are provided)
 if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET &&
     process.env.GOOGLE_CLIENT_ID !== 'YOUR_GOOGLE_CLIENT_ID_HERE') {
+
+    // Use FRONTEND_URL for callback to ensure correct protocol (https on production)
+    const callbackURL = process.env.FRONTEND_URL
+        ? `${process.env.FRONTEND_URL}/api/auth/google/callback`
+        : '/api/auth/google/callback';
+
     passport.use(new GoogleStrategy({
         clientID: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        callbackURL: '/api/auth/google/callback'
+        callbackURL: callbackURL
     }, async (accessToken, refreshToken, profile, done) => {
         try {
             // Check if user exists with this Google ID
