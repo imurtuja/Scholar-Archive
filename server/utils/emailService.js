@@ -11,7 +11,7 @@ const createTransporter = () => {
     });
 };
 
-// Password reset email template
+// Simple, reliable email template
 const getPasswordResetTemplate = (userName, resetUrl) => {
     const firstName = userName ? userName.split(' ')[0] : 'there';
 
@@ -21,86 +21,104 @@ const getPasswordResetTemplate = (userName, resetUrl) => {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body style="margin:0;padding:0;background:#f9fafb;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+<body style="margin:0;padding:0;background:#f5f7fa;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
 
-<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f9fafb;padding:40px 20px;">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f5f7fa;padding:40px 20px;">
 <tr>
 <td align="center">
 
-<table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;background:#ffffff;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+<table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:16px;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
 
-<!-- Brand Header with Gradient -->
+<!-- Header with logo -->
 <tr>
-<td style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);padding:0;height:200px;">
+<td style="padding:40px 40px 32px 40px;text-align:center;">
 <table width="100%" cellpadding="0" cellspacing="0" border="0">
 <tr>
-<td align="center" style="padding:60px 40px;">
-<h1 style="margin:0;color:#ffffff;font-size:32px;font-weight:700;text-shadow:0 2px 4px rgba(0,0,0,0.1);">Reset Your Password</h1>
+<td align="center">
+<svg width="48" height="48" viewBox="0 0 48 48" style="display:block;margin:0 auto 12px;">
+<rect width="48" height="48" rx="12" fill="#6366f1"/>
+<path d="M24 14L16 20V30C16 31.1 16.9 32 18 32H30C31.1 32 32 31.1 32 30V20L24 14Z" fill="white"/>
+<path d="M20 26H28V30H20V26Z" fill="#6366f1" opacity="0.5"/>
+</svg>
+<h2 style="margin:0;color:#1f2937;font-size:22px;font-weight:700;letter-spacing:-0.5px;">ScholarArchive</h2>
 </td>
 </tr>
 </table>
 </td>
 </tr>
 
-<!-- Main Content -->
+<!-- Divider -->
 <tr>
-<td style="padding:48px 40px;">
+<td style="padding:0 40px;">
+<div style="height:1px;background:#e5e7eb;"></div>
+</td>
+</tr>
 
-<p style="margin:0 0 24px 0;color:#111827;font-size:16px;line-height:1.6;">
-Hello ${firstName},
-</p>
+<!-- Content -->
+<tr>
+<td style="padding:40px;">
 
-<p style="margin:0 0 32px 0;color:#4b5563;font-size:15px;line-height:1.7;">
-We received a request to reset your password for your ScholarArchive account. To create a new password, please click the button below.
+<!-- Title -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0">
+<tr>
+<td align="center" style="padding-bottom:16px;">
+<h1 style="margin:0;color:#1f2937;font-size:28px;font-weight:700;">Reset Your Password</h1>
+</td>
+</tr>
+</table>
+
+<!-- Message -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0">
+<tr>
+<td align="center" style="padding-bottom:32px;">
+<p style="margin:0;color:#6b7280;font-size:16px;line-height:1.6;">
+Hi <strong style="color:#1f2937;">${firstName}</strong>, we received a request to reset your password. Click the button below to create a new password.
 </p>
+</td>
+</tr>
+</table>
 
 <!-- Button -->
 <table width="100%" cellpadding="0" cellspacing="0" border="0">
 <tr>
-<td align="center" style="padding:0 0 32px 0;">
-<a href="${resetUrl}" style="display:inline-block;background:#1f2937;color:#ffffff;text-decoration:none;padding:14px 32px;font-size:15px;font-weight:600;border-radius:4px;">Reset Password</a>
+<td align="center" style="padding-bottom:24px;">
+<a href="${resetUrl}" style="display:inline-block;background:#6366f1;color:#ffffff;text-decoration:none;padding:14px 40px;border-radius:8px;font-size:16px;font-weight:600;">Reset Password</a>
 </td>
 </tr>
 </table>
 
-<p style="margin:0 0 24px 0;color:#6b7280;font-size:14px;line-height:1.6;">
-This link will expire in 1 hour for security reasons.
-</p>
+<!-- Timer -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0">
+<tr>
+<td align="center" style="padding-bottom:24px;">
+<p style="margin:0;color:#f59e0b;font-size:14px;font-weight:600;">⏱ This link expires in 1 hour</p>
+</td>
+</tr>
+</table>
 
-<p style="margin:0 0 8px 0;color:#4b5563;font-size:14px;line-height:1.6;">
-If you didn't request this password reset, please ignore this email. Your account remains secure.
+<!-- Security note -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0">
+<tr>
+<td style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:16px;">
+<p style="margin:0;color:#15803d;font-size:14px;line-height:1.5;">
+<strong>🛡️ Security tip:</strong> If you didn't request this password reset, please ignore this email. Your account is safe.
 </p>
-
-<p style="margin:0;color:#4b5563;font-size:14px;line-height:1.6;">
-Thanks,
-</p>
-<p style="margin:4px 0 0 0;color:#4b5563;font-size:14px;line-height:1.6;">
-The ScholarArchive Team
-</p>
+</td>
+</tr>
+</table>
 
 </td>
 </tr>
 
 <!-- Footer -->
 <tr>
-<td style="background:#f9fafb;padding:32px 40px;border-top:1px solid #e5e7eb;">
-<table width="100%" cellpadding="0" cellspacing="0" border="0">
-<tr>
-<td align="center">
-<p style="margin:0 0 16px 0;color:#1f2937;font-size:16px;font-weight:700;">ScholarArchive</p>
-<p style="margin:0 0 4px 0;color:#6b7280;font-size:13px;">
-Please do not reply directly to this email.
+<td style="padding:24px 40px;text-align:center;border-top:1px solid #e5e7eb;">
+<p style="margin:0 0 8px 0;color:#9ca3af;font-size:14px;">
+Need help? Contact <a href="mailto:support@scholararchive.com" style="color:#6366f1;text-decoration:none;">support@scholararchive.com</a>
 </p>
-<p style="margin:0 0 16px 0;color:#6b7280;font-size:13px;">
-Copyright © ${new Date().getFullYear()} ScholarArchive. All rights reserved.
+<p style="margin:0;color:#d1d5db;font-size:13px;">
+© ${new Date().getFullYear()} ScholarArchive. All rights reserved.
 </p>
-<p style="margin:0;color:#9ca3af;font-size:12px;">
-<a href="mailto:support@scholararchive.com" style="color:#667eea;text-decoration:none;">Contact Us</a> | 
-<a href="#" style="color:#667eea;text-decoration:none;">Privacy Statement</a>
-</p>
-</td>
-</tr>
-</table>
 </td>
 </tr>
 
@@ -125,7 +143,7 @@ export const sendPasswordResetEmail = async (email, userName, resetUrl) => {
                 address: process.env.EMAIL_USER
             },
             to: email,
-            subject: 'Reset Your Password - ScholarArchive',
+            subject: '🔐 Reset Your Password - ScholarArchive',
             html: getPasswordResetTemplate(userName, resetUrl),
             text: `Hi ${userName || 'there'}, Reset your password here: ${resetUrl}. This link expires in 1 hour.`
         };
@@ -154,94 +172,98 @@ export const sendDeletionScheduledEmail = async (email, userName, deletionDate) 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body style="margin:0;padding:0;background:#f9fafb;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+<body style="margin:0;padding:0;background:#f5f7fa;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
 
-<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f9fafb;padding:40px 20px;">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f5f7fa;padding:40px 20px;">
 <tr>
 <td align="center">
 
-<table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;background:#ffffff;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+<table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:16px;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
 
-<!-- Header -->
+<!-- Header with logo -->
 <tr>
-<td style="background:linear-gradient(135deg,#dc2626 0%,#b91c1c 100%);padding:0;height:200px;">
+<td style="padding:40px 40px 32px 40px;text-align:center;">
 <table width="100%" cellpadding="0" cellspacing="0" border="0">
 <tr>
-<td align="center" style="padding:60px 40px;">
-<h1 style="margin:0;color:#ffffff;font-size:32px;font-weight:700;text-shadow:0 2px 4px rgba(0,0,0,0.1);">Account Deletion Notice</h1>
+<td align="center">
+<svg width="48" height="48" viewBox="0 0 48 48" style="display:block;margin:0 auto 12px;">
+<rect width="48" height="48" rx="12" fill="#ef4444"/>
+<path d="M24 14L16 20V30C16 31.1 16.9 32 18 32H30C31.1 32 32 31.1 32 30V20L24 14Z" fill="white"/>
+<path d="M20 26H28V30H20V26Z" fill="#ef4444" opacity="0.5"/>
+</svg>
+<h2 style="margin:0;color:#1f2937;font-size:22px;font-weight:700;letter-spacing:-0.5px;">ScholarArchive</h2>
 </td>
 </tr>
 </table>
+</td>
+</tr>
+
+<!-- Divider -->
+<tr>
+<td style="padding:0 40px;">
+<div style="height:1px;background:#e5e7eb;"></div>
 </td>
 </tr>
 
 <!-- Content -->
 <tr>
-<td style="padding:48px 40px;">
+<td style="padding:40px;">
 
-<p style="margin:0 0 24px 0;color:#111827;font-size:16px;line-height:1.6;">
-Hello ${firstName},
-</p>
-
-<p style="margin:0 0 32px 0;color:#4b5563;font-size:15px;line-height:1.7;">
-Your ScholarArchive account has been scheduled for deletion. Your account and all associated data will be permanently removed on:
-</p>
-
-<!-- Date Box -->
+<!-- Title -->
 <table width="100%" cellpadding="0" cellspacing="0" border="0">
 <tr>
-<td align="center" style="padding:0 0 32px 0;">
-<div style="background:#fef2f2;border:2px solid #fecaca;padding:20px 32px;display:inline-block;border-radius:4px;">
-<p style="margin:0;color:#991b1b;font-size:18px;font-weight:700;">${formattedDate}</p>
+<td align="center" style="padding-bottom:16px;">
+<h1 style="margin:0;color:#1f2937;font-size:28px;font-weight:700;">Account Deletion Scheduled</h1>
+</td>
+</tr>
+</table>
+
+<!-- Message -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0">
+<tr>
+<td align="center" style="padding-bottom:24px;">
+<p style="margin:0;color:#6b7280;font-size:16px;line-height:1.6;">
+Hi <strong style="color:#1f2937;">${firstName}</strong>, your account is scheduled to be permanently deleted on:
+</p>
+</td>
+</tr>
+</table>
+
+<!-- Date -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0">
+<tr>
+<td align="center" style="padding-bottom:32px;">
+<div style="background:#fef2f2;border:2px solid #fecaca;border-radius:8px;padding:16px 24px;display:inline-block;">
+<p style="margin:0;color:#dc2626;font-size:18px;font-weight:700;">📅 ${formattedDate}</p>
 </div>
 </td>
 </tr>
 </table>
 
-<p style="margin:0 0 24px 0;color:#4b5563;font-size:15px;line-height:1.7;">
-<strong>What happens next:</strong>
+<!-- Info box -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0">
+<tr>
+<td style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:20px;margin-bottom:20px;">
+<p style="margin:0 0 12px 0;color:#15803d;font-size:15px;font-weight:600;">💡 Changed your mind?</p>
+<p style="margin:0;color:#166534;font-size:14px;line-height:1.6;">
+You can cancel this deletion by simply logging into your account before the scheduled date. All your data will remain intact.
 </p>
-
-<p style="margin:0 0 12px 0;color:#4b5563;font-size:14px;line-height:1.6;">
-• All account data will be permanently deleted<br>
-• Saved articles and research notes will be removed<br>
-• Account preferences and settings will be erased
-</p>
-
-<p style="margin:32px 0 24px 0;color:#059669;font-size:15px;line-height:1.7;background:#f0fdf4;padding:16px;border-left:4px solid #10b981;">
-<strong>Changed your mind?</strong> You can cancel this deletion by logging into your account before the scheduled date. All your data will remain intact.
-</p>
-
-<p style="margin:0;color:#4b5563;font-size:14px;line-height:1.6;">
-Thanks,
-</p>
-<p style="margin:4px 0 0 0;color:#4b5563;font-size:14px;line-height:1.6;">
-The ScholarArchive Team
-</p>
+</td>
+</tr>
+</table>
 
 </td>
 </tr>
 
 <!-- Footer -->
 <tr>
-<td style="background:#f9fafb;padding:32px 40px;border-top:1px solid #e5e7eb;">
-<table width="100%" cellpadding="0" cellspacing="0" border="0">
-<tr>
-<td align="center">
-<p style="margin:0 0 16px 0;color:#1f2937;font-size:16px;font-weight:700;">ScholarArchive</p>
-<p style="margin:0 0 4px 0;color:#6b7280;font-size:13px;">
-Please do not reply directly to this email.
+<td style="padding:24px 40px;text-align:center;border-top:1px solid #e5e7eb;">
+<p style="margin:0 0 8px 0;color:#9ca3af;font-size:14px;">
+Questions? Contact <a href="mailto:support@scholararchive.com" style="color:#ef4444;text-decoration:none;">support@scholararchive.com</a>
 </p>
-<p style="margin:0 0 16px 0;color:#6b7280;font-size:13px;">
-Copyright © ${new Date().getFullYear()} ScholarArchive. All rights reserved.
+<p style="margin:0;color:#d1d5db;font-size:13px;">
+© ${new Date().getFullYear()} ScholarArchive. All rights reserved.
 </p>
-<p style="margin:0;color:#9ca3af;font-size:12px;">
-<a href="mailto:support@scholararchive.com" style="color:#dc2626;text-decoration:none;">Contact Us</a> | 
-<a href="#" style="color:#dc2626;text-decoration:none;">Privacy Statement</a>
-</p>
-</td>
-</tr>
-</table>
 </td>
 </tr>
 
@@ -260,7 +282,7 @@ Copyright © ${new Date().getFullYear()} ScholarArchive. All rights reserved.
                 address: process.env.EMAIL_USER
             },
             to: email,
-            subject: 'Account Deletion Scheduled - ScholarArchive',
+            subject: '⚠️ Account Deletion Scheduled - ScholarArchive',
             html: html,
             text: `Hi ${firstName}, your ScholarArchive account is scheduled for deletion on ${formattedDate}. To cancel, simply log in before this date.`
         };
@@ -286,88 +308,106 @@ export const sendVerificationOTP = async (email, userName, otp) => {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body style="margin:0;padding:0;background:#f9fafb;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+<body style="margin:0;padding:0;background:#f5f7fa;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
 
-<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f9fafb;padding:40px 20px;">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f5f7fa;padding:40px 20px;">
 <tr>
 <td align="center">
 
-<table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;background:#ffffff;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+<table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:16px;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
 
-<!-- Header -->
+<!-- Header with logo -->
 <tr>
-<td style="background:linear-gradient(135deg,#059669 0%,#047857 100%);padding:0;height:200px;">
+<td style="padding:40px 40px 32px 40px;text-align:center;">
 <table width="100%" cellpadding="0" cellspacing="0" border="0">
 <tr>
-<td align="center" style="padding:60px 40px;">
-<h1 style="margin:0;color:#ffffff;font-size:32px;font-weight:700;text-shadow:0 2px 4px rgba(0,0,0,0.1);">Verify Your Email</h1>
+<td align="center">
+<svg width="48" height="48" viewBox="0 0 48 48" style="display:block;margin:0 auto 12px;">
+<rect width="48" height="48" rx="12" fill="#10b981"/>
+<path d="M24 14L16 20V30C16 31.1 16.9 32 18 32H30C31.1 32 32 31.1 32 30V20L24 14Z" fill="white"/>
+<path d="M20 26H28V30H20V26Z" fill="#10b981" opacity="0.5"/>
+</svg>
+<h2 style="margin:0;color:#1f2937;font-size:22px;font-weight:700;letter-spacing:-0.5px;">ScholarArchive</h2>
 </td>
 </tr>
 </table>
+</td>
+</tr>
+
+<!-- Divider -->
+<tr>
+<td style="padding:0 40px;">
+<div style="height:1px;background:#e5e7eb;"></div>
 </td>
 </tr>
 
 <!-- Content -->
 <tr>
-<td style="padding:48px 40px;">
+<td style="padding:40px;">
 
-<p style="margin:0 0 24px 0;color:#111827;font-size:16px;line-height:1.6;">
-Hello ${firstName},
-</p>
+<!-- Title -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0">
+<tr>
+<td align="center" style="padding-bottom:16px;">
+<h1 style="margin:0;color:#1f2937;font-size:28px;font-weight:700;">Verify Your Email</h1>
+</td>
+</tr>
+</table>
 
-<p style="margin:0 0 32px 0;color:#4b5563;font-size:15px;line-height:1.7;">
-Thank you for creating a ScholarArchive account. To complete your registration, please verify your email address by entering the code below:
+<!-- Message -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0">
+<tr>
+<td align="center" style="padding-bottom:24px;">
+<p style="margin:0;color:#6b7280;font-size:16px;line-height:1.6;">
+Hi <strong style="color:#1f2937;">${firstName}</strong>, use the code below to verify your email and complete your registration:
 </p>
+</td>
+</tr>
+</table>
 
 <!-- OTP Code -->
 <table width="100%" cellpadding="0" cellspacing="0" border="0">
 <tr>
-<td align="center" style="padding:0 0 32px 0;">
-<div style="background:#f0fdf4;border:2px solid #86efac;padding:24px 48px;display:inline-block;border-radius:4px;">
-<p style="margin:0;color:#065f46;font-size:40px;font-weight:700;letter-spacing:12px;font-family:monospace;">${otp}</p>
+<td align="center" style="padding-bottom:24px;">
+<div style="background:#f0fdf4;border:2px solid #bbf7d0;border-radius:12px;padding:24px 40px;display:inline-block;">
+<p style="margin:0;color:#059669;font-size:36px;font-weight:700;letter-spacing:8px;font-family:monospace;">${otp}</p>
 </div>
 </td>
 </tr>
 </table>
 
-<p style="margin:0 0 24px 0;color:#6b7280;font-size:14px;line-height:1.6;">
-This verification code will expire in 10 minutes.
-</p>
+<!-- Timer -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0">
+<tr>
+<td align="center" style="padding-bottom:24px;">
+<p style="margin:0;color:#f59e0b;font-size:14px;font-weight:600;">⏱ This code expires in 10 minutes</p>
+</td>
+</tr>
+</table>
 
-<p style="margin:0 0 8px 0;color:#4b5563;font-size:14px;line-height:1.6;">
-If you didn't create this account, please ignore this email.
+<!-- Security note -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0">
+<tr>
+<td style="background:#fef3c7;border:1px solid #fcd34d;border-radius:8px;padding:16px;">
+<p style="margin:0;color:#92400e;font-size:14px;line-height:1.5;">
+<strong>🛡️ Security tip:</strong> Never share this code with anyone. Our team will never ask for your OTP.
 </p>
-
-<p style="margin:0;color:#4b5563;font-size:14px;line-height:1.6;">
-Thanks,
-</p>
-<p style="margin:4px 0 0 0;color:#4b5563;font-size:14px;line-height:1.6;">
-The ScholarArchive Team
-</p>
+</td>
+</tr>
+</table>
 
 </td>
 </tr>
 
 <!-- Footer -->
 <tr>
-<td style="background:#f9fafb;padding:32px 40px;border-top:1px solid #e5e7eb;">
-<table width="100%" cellpadding="0" cellspacing="0" border="0">
-<tr>
-<td align="center">
-<p style="margin:0 0 16px 0;color:#1f2937;font-size:16px;font-weight:700;">ScholarArchive</p>
-<p style="margin:0 0 4px 0;color:#6b7280;font-size:13px;">
-Please do not reply directly to this email.
+<td style="padding:24px 40px;text-align:center;border-top:1px solid #e5e7eb;">
+<p style="margin:0 0 8px 0;color:#9ca3af;font-size:14px;">
+Need help? Contact <a href="mailto:support@scholararchive.com" style="color:#10b981;text-decoration:none;">support@scholararchive.com</a>
 </p>
-<p style="margin:0 0 16px 0;color:#6b7280;font-size:13px;">
-Copyright © ${new Date().getFullYear()} ScholarArchive. All rights reserved.
+<p style="margin:0;color:#d1d5db;font-size:13px;">
+© ${new Date().getFullYear()} ScholarArchive. All rights reserved.
 </p>
-<p style="margin:0;color:#9ca3af;font-size:12px;">
-<a href="mailto:support@scholararchive.com" style="color:#059669;text-decoration:none;">Contact Us</a> | 
-<a href="#" style="color:#059669;text-decoration:none;">Privacy Statement</a>
-</p>
-</td>
-</tr>
-</table>
 </td>
 </tr>
 
@@ -386,7 +426,7 @@ Copyright © ${new Date().getFullYear()} ScholarArchive. All rights reserved.
                 address: process.env.EMAIL_USER
             },
             to: email,
-            subject: 'Verify Your Email - ScholarArchive',
+            subject: '✅ Verify Your Email - ScholarArchive',
             html: html,
             text: `Hi ${firstName}, your verification code is: ${otp}. This code expires in 10 minutes.`
         };
