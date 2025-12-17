@@ -569,17 +569,6 @@ const Subjects = () => {
                 return;
             }
 
-            // Initialize Gemini AI with temperature 0 for consistent results
-            const genAI = new GoogleGenerativeAI(apiKey);
-            const model = genAI.getGenerativeModel({
-                model: "gemini-2.0-flash",
-                generationConfig: {
-                    temperature: 0,  // Deterministic output - same input = same output
-                    topP: 1,
-                    topK: 1
-                }
-            });
-
             // Enhanced AI prompt for professional syllabus extraction
             const promptText = `You are an expert academic syllabus parser with deep knowledge of academic subjects.
 
@@ -651,10 +640,62 @@ ${useImages ? 'Parse syllabus from images:' : `SYLLABUS:\n${fullText.substring(0
                 contentParts.push(...imageParts);
             }
 
-            // Generate response
-            const result = await model.generateContent(contentParts);
-            const response = await result.response;
-            let text = response.text();
+            // Fallback logic for models
+            // Priority: Flash Lite (efficient) -> 2.0 Flash -> 2.5 Flash -> Experimental
+            const modelsToTry = [
+                "gemini-2.0-flash-lite-preview-02-05", // Try specific lite preview first
+                "gemini-2.0-flash-lite",                // Generic lite
+                "gemini-2.0-flash",                     // Standard 2.0 (fallback)
+                "gemini-2.5-flash",                     // New 2.5
+                "gemini-exp-1206",                      // Experimental (often good quotas)
+                "gemini-2.0-flash-exp"                  // Older experimental
+            ];
+            let text = null;
+            let lastError = null;
+
+            for (const modelName of modelsToTry) {
+                try {
+                    console.log(`Attempting to generate with model: ${modelName}`);
+                    const genAI = new GoogleGenerativeAI(apiKey);
+                    const model = genAI.getGenerativeModel({
+                        model: modelName,
+                        generationConfig: {
+                            temperature: 0,
+                            topP: 1,
+                            topK: 1
+                        }
+                    });
+
+                    const result = await model.generateContent(contentParts);
+                    const response = await result.response;
+                    text = response.text();
+
+                    if (text) break; // Success!
+                } catch (err) {
+                    console.warn(`Model ${modelName} failed:`, err.message);
+                    lastError = err;
+                    // If it's not a quota error or 429, maybe don't retry? 
+                    // But usually trying another model is safe.
+                    // Continue to next model
+                }
+            }
+
+            if (!text) {
+                // Debugging: List available models to console to help diagnose 404s
+                try {
+                    console.log("Fetching list of available models for debugging...");
+                    const listModelsRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
+                    const listModelsData = await listModelsRes.json();
+                    const availableModels = listModelsData.models ? listModelsData.models.map(m => m.name.replace('models/', '')) : [];
+
+                    console.log("AVAILABLE MODELS FOR THIS API KEY:", availableModels);
+                    toast.error(`AI Models blocked. Available: ${availableModels.join(', ') || 'None'}`);
+                } catch (debugErr) {
+                    console.error("Failed to list models:", debugErr);
+                }
+
+                throw new Error(`All AI models failed. Last error: ${lastError?.message || 'Unknown error'}`);
+            }
 
             // Clean up response - extract JSON
             text = text.replace(/```json/gi, '').replace(/```/g, '').trim();
