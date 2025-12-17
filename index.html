@@ -9,7 +9,158 @@
 </head>
 
 <body>
-  <div id="root"></div>
+  <style>
+    /* Critical CSS for Instant Splash Screen */
+    body {
+      margin: 0;
+      background-color: #0a0a14;
+      overflow: hidden;
+    }
+
+    #splash-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      background: radial-gradient(circle at center, #1a1a2e 0%, #0a0a14 100%);
+      transition: opacity 0.5s ease-out;
+    }
+
+    .splash-rings {
+      position: relative;
+      width: 160px;
+      height: 160px;
+      margin-bottom: 2.5rem;
+    }
+
+    .ring-outer {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      border-top-color: #6366f1;
+      border-right-color: #8b5cf6;
+      width: 100%;
+      height: 100%;
+      filter: drop-shadow(0 0 10px rgba(99, 102, 241, 0.5));
+      animation: spin 2.5s cubic-bezier(0.55, 0.055, 0.675, 0.19) infinite;
+    }
+
+    .ring-inner {
+      position: absolute;
+      inset: 15px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      border-bottom-color: #a855f7;
+      border-left-color: #ec4899;
+      filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.5));
+      animation: spin 3s cubic-bezier(0.215, 0.61, 0.355, 1) infinite reverse;
+    }
+
+    .splash-logo {
+      position: absolute;
+      inset: 25px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      box-shadow: inset 0 0 20px rgba(99, 102, 241, 0.1);
+    }
+
+    .splash-logo img {
+      width: 85%;
+      height: 85%;
+      object-fit: contain;
+      filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.3));
+    }
+
+    .splash-text {
+      font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.9);
+      text-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+      margin-bottom: 1.5rem;
+      animation: pulse 3s ease-in-out infinite;
+    }
+
+    .splash-bar {
+      width: 180px;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 9999px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .splash-bar-inner {
+      height: 100%;
+      background: linear-gradient(90deg, transparent, #6366f1, #a855f7, transparent);
+      width: 50%;
+      position: absolute;
+      left: -50%;
+      animation: shimmer 2s infinite ease-in-out;
+    }
+
+    @keyframes spin {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 0.8;
+      }
+
+      50% {
+        opacity: 1;
+        text-shadow: 0 0 30px rgba(139, 92, 246, 0.8);
+      }
+    }
+
+    @keyframes shimmer {
+      0% {
+        left: -60%;
+      }
+
+      100% {
+        left: 110%;
+      }
+    }
+  </style>
+  <div id="root">
+    <div id="splash-screen">
+      <div class="splash-rings">
+        <div class="ring-outer"></div>
+        <div class="ring-inner"></div>
+        <div class="splash-logo">
+          <img src="/logo.png" alt="Logo" />
+        </div>
+      </div>
+      <div class="splash-text">Scholar Archive</div>
+      <div class="splash-bar">
+        <div class="splash-bar-inner"></div>
+      </div>
+    </div>
+  </div>
   <script type="module" src="/src/main.jsx"></script>
 </body>
 

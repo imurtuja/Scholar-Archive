@@ -21,11 +21,13 @@ import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
 import Contact from './pages/Contact';
 
+import LoadingScreen from './components/LoadingScreen';
+
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
   const location = useLocation();
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <LoadingScreen />;
 
   if (!user) {
     // Save the current URL so we can redirect back after login
