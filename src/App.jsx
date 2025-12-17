@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
@@ -39,7 +39,20 @@ const ProtectedRoute = ({ children }) => {
 };
 
 const AppContent = () => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+
+  useEffect(() => {
+    if (!loading) {
+      const loader = document.getElementById('global-loader');
+      if (loader) {
+        // Smooth transition out
+        loader.style.opacity = '0';
+        setTimeout(() => {
+          loader.remove();
+        }, 500); // Match CSS transition duration
+      }
+    }
+  }, [loading]);
 
   return (
     <Router>
