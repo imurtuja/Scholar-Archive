@@ -49,6 +49,8 @@ const AppContent = () => {
         loader.style.opacity = '0';
         setTimeout(() => {
           loader.remove();
+          // Restore scrolling
+          document.body.style.overflow = 'unset';
         }, 500); // Match CSS transition duration
       }
     }
