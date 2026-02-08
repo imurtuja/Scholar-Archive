@@ -10,6 +10,25 @@ import ConfirmModal from '../components/ConfirmModal';
 import ShareModal from '../components/ShareModal';
 import usePageTitle from '../hooks/usePageTitle';
 
+// Skeleton Components for loading states
+const SkeletonPulse = ({ className }) => (
+    <div className={`animate-pulse bg-white/10 rounded ${className}`} />
+);
+
+const ResourceCardSkeleton = () => (
+    <div className="bg-[#13131f] border border-white/10 rounded-2xl p-5">
+        <div className="flex items-center gap-3 mb-4">
+            <SkeletonPulse className="w-11 h-11 rounded-xl" />
+            <div className="flex-1 space-y-2">
+                <SkeletonPulse className="h-5 w-48 rounded" />
+                <SkeletonPulse className="h-3 w-32 rounded" />
+            </div>
+            <SkeletonPulse className="w-8 h-8 rounded-xl" />
+        </div>
+        <SkeletonPulse className="h-16 w-full rounded-xl" />
+    </div>
+);
+
 const Resources = () => {
     usePageTitle('Resources');
     const { user, logout } = useAuth();
@@ -22,6 +41,7 @@ const Resources = () => {
     const [activeDropdown, setActiveDropdown] = useState(null);
     const [deleteModal, setDeleteModal] = useState({ isOpen: false, resourceId: null });
     const [shareTarget, setShareTarget] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     // Inline Post State
     const [isExpanded, setIsExpanded] = useState(false);
@@ -64,6 +84,8 @@ const Resources = () => {
             setSubjects(Array.isArray(dataSubjects) ? dataSubjects : []);
         } catch (error) {
             console.error('Error fetching data:', error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -303,7 +325,13 @@ const Resources = () => {
 
                 {/* Feed Stream */}
                 <div className="space-y-5">
-                    {filteredResources.length > 0 ? (
+                    {loading ? (
+                        <>
+                            <ResourceCardSkeleton />
+                            <ResourceCardSkeleton />
+                            <ResourceCardSkeleton />
+                        </>
+                    ) : filteredResources.length > 0 ? (
                         filteredResources.map((res, index) => (
                             <div key={res._id || index} className="bg-[#13131f] border border-white/10 rounded-2xl overflow-hidden hover:border-indigo-500/30 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-500/10 transition-all duration-300">
                                 <div className="p-5">

@@ -18,6 +18,7 @@ const ActivitySchema = new mongoose.Schema({
             'resource_add',
             'resource_delete',
             'exam_add',
+            'exam_edit',
             'exam_delete',
             'exam_complete',
             'login'

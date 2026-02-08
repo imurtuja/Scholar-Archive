@@ -13,6 +13,32 @@ import pdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
 
+// Skeleton Components for loading states
+const SkeletonPulse = ({ className }) => (
+    <div className={`animate-pulse bg-white/10 rounded ${className}`} />
+);
+
+const SubjectTreeSkeleton = () => (
+    <div className="py-3 px-2 space-y-2">
+        {[1, 2, 3].map(year => (
+            <div key={year} className="space-y-1">
+                <div className="flex items-center gap-2 px-3 py-2">
+                    <SkeletonPulse className="w-4 h-4 rounded" />
+                    <SkeletonPulse className="h-4 w-20 rounded" />
+                </div>
+                <div className="pl-6 space-y-1">
+                    {[1, 2].map(sem => (
+                        <div key={sem} className="flex items-center gap-2 px-3 py-1.5">
+                            <SkeletonPulse className="w-3 h-3 rounded" />
+                            <SkeletonPulse className="h-3 w-24 rounded" />
+                        </div>
+                    ))}
+                </div>
+            </div>
+        ))}
+    </div>
+);
+
 // Custom Form Select Component
 const FormSelect = ({ label, name, value, onChange, options, placeholder, required = false }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -225,6 +251,7 @@ const Subjects = () => {
     const [isAddSubjectModalOpen, setIsAddSubjectModalOpen] = useState(false);
     const [isEditSubjectModalOpen, setIsEditSubjectModalOpen] = useState(false);
     const [shareSubject, setShareSubject] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     // Dynamic page title based on current state
     const getPageTitle = () => {
@@ -407,7 +434,10 @@ const Subjects = () => {
     const fetchSubjects = async () => {
         try {
             const token = localStorage.getItem('token');
-            if (!token) return;
+            if (!token) {
+                setLoading(false);
+                return;
+            }
 
             const res = await fetch('/api/subjects', {
                 headers: { 'x-auth-token': token }
@@ -432,6 +462,8 @@ const Subjects = () => {
         } catch (error) {
             console.error('Error fetching subjects:', error);
             setSubjects([]);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -777,81 +809,85 @@ ${useImages ? 'Parse syllabus from images:' : `SYLLABUS:\n${fullText.substring(0
                     </div>
 
                     {/* Subject Tree */}
-                    <div className="py-3">
-                        {(() => {
-                            const duration = user?.durationYears || 4;
-                            const structure = {};
-                            for (let y = 1; y <= duration; y++) {
-                                const yearLabel = `${y}${getOrdinal(y)} Year`;
-                                structure[yearLabel] = {};
-                                for (let s = 1; s <= 2; s++) {
-                                    structure[yearLabel][`${s}${getOrdinal(s)} Semester`] = [];
+                    {loading ? (
+                        <SubjectTreeSkeleton />
+                    ) : (
+                        <div className="py-3">
+                            {(() => {
+                                const duration = user?.durationYears || 4;
+                                const structure = {};
+                                for (let y = 1; y <= duration; y++) {
+                                    const yearLabel = `${y}${getOrdinal(y)} Year`;
+                                    structure[yearLabel] = {};
+                                    for (let s = 1; s <= 2; s++) {
+                                        structure[yearLabel][`${s}${getOrdinal(s)} Semester`] = [];
+                                    }
                                 }
-                            }
 
-                            subjects.forEach(subject => {
-                                const y = subject.year;
-                                const s = subject.semester;
-                                if (structure[y] && structure[y][s]) {
-                                    structure[y][s].push(subject);
-                                } else {
-                                    if (!structure['Other']) structure['Other'] = {};
-                                    if (!structure['Other']['General']) structure['Other']['General'] = [];
-                                    structure['Other']['General'].push(subject);
-                                }
-                            });
+                                subjects.forEach(subject => {
+                                    const y = subject.year;
+                                    const s = subject.semester;
+                                    if (structure[y] && structure[y][s]) {
+                                        structure[y][s].push(subject);
+                                    } else {
+                                        if (!structure['Other']) structure['Other'] = {};
+                                        if (!structure['Other']['General']) structure['Other']['General'] = [];
+                                        structure['Other']['General'].push(subject);
+                                    }
+                                });
 
-                            return Object.entries(structure).map(([year, semesters]) => (
-                                <div key={year} className="mb-5">
-                                    {/* Year Label */}
-                                    <div className="px-5 pb-2 text-xs font-semibold text-white/40 uppercase tracking-wide">
-                                        {year}
-                                    </div>
+                                return Object.entries(structure).map(([year, semesters]) => (
+                                    <div key={year} className="mb-5">
+                                        {/* Year Label */}
+                                        <div className="px-5 pb-2 text-xs font-semibold text-white/40 uppercase tracking-wide">
+                                            {year}
+                                        </div>
 
-                                    {/* Semesters */}
-                                    {Object.entries(semesters).map(([semester, semesterSubjects]) => {
-                                        const semesterKey = `${year}-${semester}`;
-                                        const isExpanded = expandedSemester === semesterKey;
-                                        const hasSubjects = semesterSubjects.length > 0;
+                                        {/* Semesters */}
+                                        {Object.entries(semesters).map(([semester, semesterSubjects]) => {
+                                            const semesterKey = `${year}-${semester}`;
+                                            const isExpanded = expandedSemester === semesterKey;
+                                            const hasSubjects = semesterSubjects.length > 0;
 
-                                        return (
-                                            <div key={semester} className="mb-2">
-                                                {/* Semester Row */}
-                                                <div
-                                                    onClick={() => setExpandedSemester(isExpanded ? null : semesterKey)}
-                                                    className={`flex items-center gap-3 mx-3 px-3 py-2 cursor-pointer rounded-lg transition-all ${isExpanded ? 'bg-white/5' : 'hover:bg-white/5'}`}
-                                                >
-                                                    <ChevronRight size={14} className={`text-white/30 transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`} />
-                                                    <span className={`text-sm flex-1 ${isExpanded ? 'text-white font-medium' : 'text-white/60'}`}>{semester}</span>
-                                                    {hasSubjects && (
-                                                        <span className="text-[11px] text-indigo-400 bg-indigo-500/15 px-1.5 py-0.5 rounded font-medium">{semesterSubjects.length}</span>
+                                            return (
+                                                <div key={semester} className="mb-2">
+                                                    {/* Semester Row */}
+                                                    <div
+                                                        onClick={() => setExpandedSemester(isExpanded ? null : semesterKey)}
+                                                        className={`flex items-center gap-3 mx-3 px-3 py-2 cursor-pointer rounded-lg transition-all ${isExpanded ? 'bg-white/5' : 'hover:bg-white/5'}`}
+                                                    >
+                                                        <ChevronRight size={14} className={`text-white/30 transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`} />
+                                                        <span className={`text-sm flex-1 ${isExpanded ? 'text-white font-medium' : 'text-white/60'}`}>{semester}</span>
+                                                        {hasSubjects && (
+                                                            <span className="text-[11px] text-indigo-400 bg-indigo-500/15 px-1.5 py-0.5 rounded font-medium">{semesterSubjects.length}</span>
+                                                        )}
+                                                    </div>
+
+                                                    {/* Subject List */}
+                                                    {isExpanded && hasSubjects && (
+                                                        <div className="mt-1 space-y-1.5">
+                                                            {semesterSubjects.map(subject => (
+                                                                <div
+                                                                    key={subject._id}
+                                                                    onClick={() => setSelectedSubject(subject)}
+                                                                    className={`flex items-center mx-3 ml-9 px-3 py-2 rounded-lg cursor-pointer text-sm ${selectedSubject?._id === subject._id
+                                                                        ? 'bg-indigo-500 text-white'
+                                                                        : 'text-white/50 hover:bg-indigo-500/10 hover:text-white/70'
+                                                                        }`}
+                                                                >
+                                                                    <span className="truncate">{subject.name}</span>
+                                                                </div>
+                                                            ))}
+                                                        </div>
                                                     )}
                                                 </div>
-
-                                                {/* Subject List */}
-                                                {isExpanded && hasSubjects && (
-                                                    <div className="mt-1 space-y-1.5">
-                                                        {semesterSubjects.map(subject => (
-                                                            <div
-                                                                key={subject._id}
-                                                                onClick={() => setSelectedSubject(subject)}
-                                                                className={`flex items-center mx-3 ml-9 px-3 py-2 rounded-lg cursor-pointer text-sm ${selectedSubject?._id === subject._id
-                                                                    ? 'bg-indigo-500 text-white'
-                                                                    : 'text-white/50 hover:bg-indigo-500/10 hover:text-white/70'
-                                                                    }`}
-                                                            >
-                                                                <span className="truncate">{subject.name}</span>
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                )}
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            ));
-                        })()}
-                    </div>
+                                            );
+                                        })}
+                                    </div>
+                                ));
+                            })()}
+                        </div>
+                    )}
                 </div>
             </div>
 

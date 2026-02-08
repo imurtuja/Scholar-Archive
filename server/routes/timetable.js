@@ -127,5 +127,45 @@ router.put('/:id/toggle', auth, async (req, res) => {
     }
 });
 
+// Update exam
+router.put('/:id', auth, async (req, res) => {
+    try {
+        const { subject, date, time, year, semester } = req.body;
+
+        // Validate required fields
+        if (!subject || !date || !time || !year || !semester) {
+            return res.status(400).json({ message: 'Missing required fields: subject, date, time, year, and semester are required' });
+        }
+
+        const exam = await Timetable.findById(req.params.id);
+        if (!exam) return res.status(404).json({ message: 'Exam not found' });
+
+        if (exam.user.toString() !== req.user.id) {
+            return res.status(401).json({ message: 'Not authorized' });
+        }
+
+        exam.subject = subject;
+        exam.date = date;
+        exam.time = time;
+        exam.year = year;
+        exam.semester = semester;
+
+        await exam.save();
+
+        // Log activity
+        await new Activity({
+            user: req.user.id,
+            action: 'exam_edit',
+            description: `Edited exam: ${subject}`,
+            metadata: { examId: exam._id, subject, date }
+        }).save();
+
+        res.json(exam);
+    } catch (err) {
+        console.error('[ERROR] PUT /api/timetable/:id:', err);
+        res.status(500).json({ message: 'Server Error: ' + err.message });
+    }
+});
+
 export default router;
 

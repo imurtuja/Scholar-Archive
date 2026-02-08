@@ -4,9 +4,50 @@ import { Link } from 'react-router-dom';
 import { BookOpen, FileText, Calendar, ArrowRight, FolderOpen, Sparkles, GraduationCap, User, Clock, CheckCircle, Trash2, Plus } from 'lucide-react';
 import usePageTitle from '../hooks/usePageTitle';
 
+// Skeleton Components
+const SkeletonPulse = ({ className }) => (
+    <div className={`animate-pulse bg-white/10 rounded ${className}`} />
+);
+
+const StatCardSkeleton = () => (
+    <div className="bg-[#13131f] border border-white/10 rounded-xl lg:rounded-2xl p-4 lg:p-5">
+        <div className="flex items-center justify-between mb-2 lg:mb-3">
+            <SkeletonPulse className="h-3 w-16 rounded" />
+            <SkeletonPulse className="w-8 h-8 lg:w-10 lg:h-10 rounded-lg lg:rounded-xl" />
+        </div>
+        <SkeletonPulse className="h-8 w-12 rounded" />
+    </div>
+);
+
+const ExamSkeleton = () => (
+    <div className="flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/5">
+        <div className="w-12 flex-shrink-0 flex flex-col items-center gap-1">
+            <SkeletonPulse className="h-2 w-8 rounded" />
+            <SkeletonPulse className="h-6 w-6 rounded" />
+            <SkeletonPulse className="h-2 w-8 rounded" />
+        </div>
+        <SkeletonPulse className="w-0.5 h-8 rounded-full" />
+        <div className="flex-1 space-y-2">
+            <SkeletonPulse className="h-4 w-3/4 rounded" />
+            <SkeletonPulse className="h-3 w-1/2 rounded" />
+        </div>
+    </div>
+);
+
+const ActivitySkeleton = () => (
+    <div className="flex items-center gap-3 p-3 bg-white/5 rounded-xl">
+        <SkeletonPulse className="w-8 h-8 rounded-lg flex-shrink-0" />
+        <div className="flex-1 space-y-2">
+            <SkeletonPulse className="h-4 w-3/4 rounded" />
+            <SkeletonPulse className="h-3 w-1/3 rounded" />
+        </div>
+    </div>
+);
+
 const Dashboard = () => {
     usePageTitle('Dashboard');
     const { user } = useAuth();
+    const [loading, setLoading] = useState(true);
     const [stats, setStats] = useState({
         totalSubjects: 0,
         totalResources: 0,
@@ -26,6 +67,8 @@ const Dashboard = () => {
                 if (res.ok) setStats(data);
             } catch (error) {
                 console.error('Error fetching stats:', error);
+            } finally {
+                setLoading(false);
             }
         };
         fetchStats();
@@ -83,53 +126,64 @@ const Dashboard = () => {
 
             {/* Stats Row */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
-                <Link to="/subjects" className="group relative bg-[#13131f] border border-white/10 rounded-xl lg:rounded-2xl p-4 lg:p-5 hover:border-indigo-500/50 transition-all duration-300 cursor-pointer hover:-translate-y-1 hover:shadow-lg hover:shadow-indigo-500/10 overflow-hidden">
-                    {/* Gradient Glow */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/0 to-purple-500/0 group-hover:from-indigo-500/5 group-hover:to-purple-500/5 transition-all duration-300" />
-                    <div className="relative flex items-center justify-between mb-2 lg:mb-3">
-                        <span className="text-[10px] lg:text-xs text-white/30 font-medium uppercase tracking-wide">Subjects</span>
-                        <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-lg lg:rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20 group-hover:scale-110 transition-transform">
-                            <BookOpen size={16} className="lg:w-[18px] lg:h-[18px]" />
-                        </div>
-                    </div>
-                    <h3 className="relative text-2xl lg:text-3xl font-bold text-white">{stats.totalSubjects || 0}</h3>
-                </Link>
+                {loading ? (
+                    <>
+                        <StatCardSkeleton />
+                        <StatCardSkeleton />
+                        <StatCardSkeleton />
+                        <StatCardSkeleton />
+                    </>
+                ) : (
+                    <>
+                        <Link to="/subjects" className="group relative bg-[#13131f] border border-white/10 rounded-xl lg:rounded-2xl p-4 lg:p-5 hover:border-indigo-500/50 transition-all duration-300 cursor-pointer hover:-translate-y-1 hover:shadow-lg hover:shadow-indigo-500/10 overflow-hidden">
+                            {/* Gradient Glow */}
+                            <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/0 to-purple-500/0 group-hover:from-indigo-500/5 group-hover:to-purple-500/5 transition-all duration-300" />
+                            <div className="relative flex items-center justify-between mb-2 lg:mb-3">
+                                <span className="text-[10px] lg:text-xs text-white/30 font-medium uppercase tracking-wide">Subjects</span>
+                                <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-lg lg:rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20 group-hover:scale-110 transition-transform">
+                                    <BookOpen size={16} className="lg:w-[18px] lg:h-[18px]" />
+                                </div>
+                            </div>
+                            <h3 className="relative text-2xl lg:text-3xl font-bold text-white">{stats.totalSubjects || 0}</h3>
+                        </Link>
 
-                <Link to="/resources" className="group relative bg-[#13131f] border border-white/10 rounded-xl lg:rounded-2xl p-4 lg:p-5 hover:border-purple-500/50 transition-all duration-300 cursor-pointer hover:-translate-y-1 hover:shadow-lg hover:shadow-purple-500/10 overflow-hidden">
-                    {/* Gradient Glow */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-purple-500/0 to-pink-500/0 group-hover:from-purple-500/5 group-hover:to-pink-500/5 transition-all duration-300" />
-                    <div className="relative flex items-center justify-between mb-2 lg:mb-3">
-                        <span className="text-[10px] lg:text-xs text-white/30 font-medium uppercase tracking-wide">Resources</span>
-                        <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-lg lg:rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center text-white shadow-lg shadow-purple-500/20 group-hover:scale-110 transition-transform">
-                            <FileText size={16} className="lg:w-[18px] lg:h-[18px]" />
-                        </div>
-                    </div>
-                    <h3 className="relative text-2xl lg:text-3xl font-bold text-white">{stats.totalResources || 0}</h3>
-                </Link>
+                        <Link to="/resources" className="group relative bg-[#13131f] border border-white/10 rounded-xl lg:rounded-2xl p-4 lg:p-5 hover:border-purple-500/50 transition-all duration-300 cursor-pointer hover:-translate-y-1 hover:shadow-lg hover:shadow-purple-500/10 overflow-hidden">
+                            {/* Gradient Glow */}
+                            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/0 to-pink-500/0 group-hover:from-purple-500/5 group-hover:to-pink-500/5 transition-all duration-300" />
+                            <div className="relative flex items-center justify-between mb-2 lg:mb-3">
+                                <span className="text-[10px] lg:text-xs text-white/30 font-medium uppercase tracking-wide">Resources</span>
+                                <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-lg lg:rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center text-white shadow-lg shadow-purple-500/20 group-hover:scale-110 transition-transform">
+                                    <FileText size={16} className="lg:w-[18px] lg:h-[18px]" />
+                                </div>
+                            </div>
+                            <h3 className="relative text-2xl lg:text-3xl font-bold text-white">{stats.totalResources || 0}</h3>
+                        </Link>
 
-                <Link to="/timetable" className="group relative bg-[#13131f] border border-white/10 rounded-xl lg:rounded-2xl p-4 lg:p-5 hover:border-pink-500/50 transition-all duration-300 cursor-pointer hover:-translate-y-1 hover:shadow-lg hover:shadow-pink-500/10 overflow-hidden">
-                    {/* Gradient Glow */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-pink-500/0 to-rose-500/0 group-hover:from-pink-500/5 group-hover:to-rose-500/5 transition-all duration-300" />
-                    <div className="relative flex items-center justify-between mb-2 lg:mb-3">
-                        <span className="text-[10px] lg:text-xs text-white/30 font-medium uppercase tracking-wide">Exams</span>
-                        <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-lg lg:rounded-xl bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center text-white shadow-lg shadow-pink-500/20 group-hover:scale-110 transition-transform">
-                            <Calendar size={16} className="lg:w-[18px] lg:h-[18px]" />
-                        </div>
-                    </div>
-                    <h3 className="relative text-2xl lg:text-3xl font-bold text-white">{allExams.length}</h3>
-                </Link>
+                        <Link to="/timetable" className="group relative bg-[#13131f] border border-white/10 rounded-xl lg:rounded-2xl p-4 lg:p-5 hover:border-pink-500/50 transition-all duration-300 cursor-pointer hover:-translate-y-1 hover:shadow-lg hover:shadow-pink-500/10 overflow-hidden">
+                            {/* Gradient Glow */}
+                            <div className="absolute inset-0 bg-gradient-to-br from-pink-500/0 to-rose-500/0 group-hover:from-pink-500/5 group-hover:to-rose-500/5 transition-all duration-300" />
+                            <div className="relative flex items-center justify-between mb-2 lg:mb-3">
+                                <span className="text-[10px] lg:text-xs text-white/30 font-medium uppercase tracking-wide">Exams</span>
+                                <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-lg lg:rounded-xl bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center text-white shadow-lg shadow-pink-500/20 group-hover:scale-110 transition-transform">
+                                    <Calendar size={16} className="lg:w-[18px] lg:h-[18px]" />
+                                </div>
+                            </div>
+                            <h3 className="relative text-2xl lg:text-3xl font-bold text-white">{allExams.length}</h3>
+                        </Link>
 
-                <Link to="/subjects" className="group relative bg-[#13131f] border border-white/10 rounded-xl lg:rounded-2xl p-4 lg:p-5 hover:border-rose-500/50 transition-all duration-300 cursor-pointer hover:-translate-y-1 hover:shadow-lg hover:shadow-rose-500/10 overflow-hidden">
-                    {/* Gradient Glow */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-rose-500/0 to-orange-500/0 group-hover:from-rose-500/5 group-hover:to-orange-500/5 transition-all duration-300" />
-                    <div className="relative flex items-center justify-between mb-2 lg:mb-3">
-                        <span className="text-[10px] lg:text-xs text-white/30 font-medium uppercase tracking-wide">Year</span>
-                        <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-lg lg:rounded-xl bg-gradient-to-br from-rose-500 to-orange-600 flex items-center justify-center text-white shadow-lg shadow-rose-500/20 group-hover:scale-110 transition-transform">
-                            <GraduationCap size={16} className="lg:w-[18px] lg:h-[18px]" />
-                        </div>
-                    </div>
-                    <h3 className="relative text-2xl lg:text-3xl font-bold text-white">{user?.currentYear || 1}<span className="text-base lg:text-lg text-white/40">/{user?.durationYears || 4}</span></h3>
-                </Link>
+                        <Link to="/subjects" className="group relative bg-[#13131f] border border-white/10 rounded-xl lg:rounded-2xl p-4 lg:p-5 hover:border-rose-500/50 transition-all duration-300 cursor-pointer hover:-translate-y-1 hover:shadow-lg hover:shadow-rose-500/10 overflow-hidden">
+                            {/* Gradient Glow */}
+                            <div className="absolute inset-0 bg-gradient-to-br from-rose-500/0 to-orange-500/0 group-hover:from-rose-500/5 group-hover:to-orange-500/5 transition-all duration-300" />
+                            <div className="relative flex items-center justify-between mb-2 lg:mb-3">
+                                <span className="text-[10px] lg:text-xs text-white/30 font-medium uppercase tracking-wide">Year</span>
+                                <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-lg lg:rounded-xl bg-gradient-to-br from-rose-500 to-orange-600 flex items-center justify-center text-white shadow-lg shadow-rose-500/20 group-hover:scale-110 transition-transform">
+                                    <GraduationCap size={16} className="lg:w-[18px] lg:h-[18px]" />
+                                </div>
+                            </div>
+                            <h3 className="relative text-2xl lg:text-3xl font-bold text-white">{user?.currentYear || 1}<span className="text-base lg:text-lg text-white/40">/{user?.durationYears || 4}</span></h3>
+                        </Link>
+                    </>
+                )}
             </div>
 
             {/* Main Grid */}
@@ -146,7 +200,13 @@ const Dashboard = () => {
                         </Link>
                     </div>
 
-                    {allExams.length > 0 ? (
+                    {loading ? (
+                        <div className="space-y-3">
+                            <ExamSkeleton />
+                            <ExamSkeleton />
+                            <ExamSkeleton />
+                        </div>
+                    ) : allExams.length > 0 ? (
                         <div className="space-y-3">
                             {allExams.slice(0, 5).map((exam, i) => (
                                 <div key={i} className={`flex items-center gap-4 p-4 rounded-xl border transition-all ${exam.isLive
@@ -195,7 +255,14 @@ const Dashboard = () => {
                             </h3>
                         </div>
 
-                        {stats.recentActivity?.length > 0 ? (
+                        {loading ? (
+                            <div className="space-y-2">
+                                <ActivitySkeleton />
+                                <ActivitySkeleton />
+                                <ActivitySkeleton />
+                                <ActivitySkeleton />
+                            </div>
+                        ) : stats.recentActivity?.length > 0 ? (
                             <div className="space-y-2">
                                 {stats.recentActivity.slice(0, 5).map((activity, i) => {
                                     const getActivityIcon = (action) => {
