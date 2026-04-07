@@ -37,7 +37,7 @@ A beautifully crafted, intelligent platform dedicated to organizing subjects, ma
       <br/>
       <strong>Murtuja</strong>
       <br/>
-      <sub>Software Engineer</sub>
+      <sub>Full-Stack Developer</sub>
     </td>
     <td>
       <p>
@@ -225,7 +225,7 @@ Contributions, issues, and feature requests are welcome!
 
 ## <img src="https://api.iconify.design/mdi:email-fast.svg?color=%238b5cf6" width="28" align="center" /> Contact
 
-**Murtuja** - Software Engineer
+**Murtuja** - Full-Stack Developer
 
 <p>
   <a href="https://www.murtuja.in"><img src="https://img.shields.io/badge/Portfolio-murtuja.in-2563EB?style=for-the-badge&logo=globe&logoColor=white" alt="Portfolio" /></a>
